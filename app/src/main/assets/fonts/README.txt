@@ -1,0 +1,1 @@
+Bundled font library (20 files): Noto Kufi Arabic, FreeSans, FreeSerif, and DejaVu Sans variants. The adjacent LICENSE-*.txt files contain the copyright/license information supplied by the operating-system font packages. The app previews the selected font and places that exact font file in exported FUTO theme ZIPs.
