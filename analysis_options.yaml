@@ -1,0 +1,6 @@
+include: package:flutter_lints/flutter.yaml
+linter:
+  rules:
+    prefer_const_constructors: true
+    avoid_print: true
+    no_leading_underscores_for_local_identifiers: true

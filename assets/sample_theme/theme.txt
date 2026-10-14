@@ -1,0 +1,418 @@
+
+#  ▄███████████████                   ▄▄▄████████▒░      ▄▄▄
+# ████████████████████▒░      ██████████████████▒░   ▄█████████▄
+# ░▒▒▒▒▒█████▒▒▒▒▒███▒░        ▒███████████▒▒▒▒▒░  ▄█████████████▄
+#      █████████░░▒▒▒░███░   ███▒░▒▒▒▒█████▒░░░░  ██████▀   ▀██████░
+#     ████████▒▒░ ░░░ ███▒░  ███▒ ░░░░█████▒░    ██████       ██████▒
+#    ▄███▒▒▒▒▒░░     ███▒░  ███▒░     █████▒░    ░██████▄   ▄██████▒░
+#    ███▒░░░░░      ▐████▄▄███▒░      ░█████▒░    ░▒█████████████▒▒░
+#    ██▒░            ▐███████▒░        ░▒██▒░      ░░▒█████████▒▒░
+#    ░▒░              ▒▒▒▒▒▒▒░          ░▒▒░         ░░▒▒▒▒▒▒▒░░░
+#     ░               ░░░░░░░            ░░            ░░░░░░░
+#          ▄██████▄░ ▄██████▄░ ▄██████▄░ ▄██████▄░ ▄██████▄░
+#          ████████▒░████████▒░████████▒░████████▒░████████▒░
+#          ▀██████▀░ ▀██████▀░ ▀██████▀░ ▀██████▀░ ▀██████▀░
+#           ░▒▒▒▒▒░   ░▒▒▒▒▒░   ░▒▒▒▒▒░   ░▒▒▒▒▒░   ░▒▒▒▒▒░
+#          ▄██████▄░ ▄██████▄░ ▄██████▄░ ▄██████▄░ ▄██████▄░
+#          ████████▒░████████▒░████████▒░████████▒░████████▒░
+#          ▀██████▀░ ▀██████▀░ ▀██████▀░ ▀██████▀░ ▀██████▀░
+#           ░▒▒▒▒▒░   ░▒▒▒▒▒░   ░▒▒▒▒▒░   ░▒▒▒▒▒░   ░▒▒▒▒▒░
+#            ░░░░░  ▄█████████████████████████████▄░ ░░░░░
+#                   ███████████████████████████████▒░
+#                   ▀█████████████████████████████▀░
+#                    ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░
+#                     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+#
+#                  FUTO Keyboard Theme Configuration
+#                        Format version: 1.0
+#
+# Although there are comments to help you, please check our guide for
+# more information. It can be found at:
+#                      https://docs.keyboard.futo.tech/theme/advanced
+#
+# If blindly editing configuration files isn't your thing, there is a
+# much easier way which is our theme editor web app. You can see live
+# realtime previews of the keyboard with different sizes or languages
+# as well as an easy editing interface. Try it out at:
+#                             https://keyboard.futo.tech/theme-editor
+#
+# Have fun theming!
+# -------------------------------------------------------------------
+
+name = "Pet Keys"
+author = "TrashKittQueen"
+id = "p.trashkittyqueen.petkeys"
+version = 2
+description = "Pet owner/animal lover theme made by TrashKittyQueen.Manosque font by Ariel Martín Pérez (SIL Open Font License v1.1)"
+
+[options]
+auto_borders = true
+center_hints = false
+roundedness = 1
+scale_text = 1.2
+scale_hints = 0.9
+weight_text = 400
+weight_hints = 400
+
+# -------------------------------------------------------------------
+# There are many colors here, so it'll likely be difficult for you to
+# edit them by hand. We would recommend you to use a Material 3 color
+# generator or our theme editor linked above. Color format: #RRGGBBAA
+# If you change a color, remove its "# inherited" comment if present.
+# -------------------------------------------------------------------
+
+[colors]
+primary = "#6b5a0d"
+on_primary = "#fae289" # inherited
+primary_container = "#fae289" # inherited
+on_primary_container = "#221b00" # inherited
+inverse_primary = "#ddc670" # inherited
+
+secondary = "#845418" # inherited
+on_secondary = "#ffffff" # inherited
+secondary_container = "#ffdcbc" # inherited
+on_secondary_container = "#291805" # inherited
+
+tertiary = "#8d4a59" # inherited
+on_tertiary = "#ffffff" # inherited
+tertiary_container = "#ffd9df" # inherited
+on_tertiary_container = "#2a161a" # inherited
+
+background = "#fff8f4" # inherited
+on_background = "#1d1b19" # inherited
+
+surface = "#fff8f4" # inherited
+on_surface = "#1d1b19" # inherited
+surface_variant = "#ece1d4" # inherited
+on_surface_variant = "#4c463c" # inherited
+surface_tint = "#6b5a0d" # inherited
+inverse_surface = "#33302d" # inherited
+inverse_on_surface = "#f6efeb" # inherited
+
+error = "#c00100" # inherited
+on_error = "#ffffff" # inherited
+error_container = "#ffdad4" # inherited
+on_error_container = "#2a1613" # inherited
+
+outline = "#7b7673cc" # inherited
+outline_variant = "#4c474466"
+scrim = "#000000" # inherited
+
+surface_bright = "#fff8f4" # inherited
+surface_dim = "#dfd9d5" # inherited
+surface_container = "#f3ede9" # inherited
+surface_container_high = "#ede7e3" # inherited
+surface_container_highest = "#e7e2de" # inherited
+surface_container_low = "#f9f3ef" # inherited
+surface_container_lowest = "#ffffff" # inherited
+
+keyboard_surface = "#cca77a"
+keyboard_surface_dim = "#cca77a"
+keyboard_container = "#96aa8b"
+keyboard_container_variant = "#819577" # inherited
+on_keyboard_container = "#414447"
+keyboard_press = "#ddc670" # inherited
+keyboard_container_pressed = "#7b767354" # inherited
+on_keyboard_container_pressed = "#7b767300" # inherited
+
+[options.font]
+font = "Manosque-Regular.ttf"
+
+[options.background]
+image = "PetKeys-background.png"
+opacity = 1
+action_bar_opacity = 0.26
+cropping = [0.06, 0.06, 0.9, 0.9]
+
+# -------------------------------------------------------------------
+# Matchrules will apply a key border or icon to a group of keys based
+# on the selector.  They are order-dependent, only the first matching
+# rule will be applied.
+# -------------------------------------------------------------------
+
+[[matchrules.border]]
+selector = "pressed functional row 0 col 0"
+asset = "Button-default-press-dark.png"
+
+[[matchrules.border]]
+selector = "pressed label 3"
+asset = "Button-default-press.png"
+
+[[matchrules.border]]
+selector = "pressed col 3 row 0"
+asset = "Button-default-press-dark.png"
+
+[[matchrules.border]]
+selector = "pressed col 1 row 2"
+asset = "Button-default-press.png"
+
+[[matchrules.border]]
+selector = "pressed col 0 row 0"
+asset = "Button-default-press.png"
+
+[[matchrules.border]]
+selector = "normal col 0 row 0"
+asset = "Button-alt2.png"
+
+[[matchrules.border]]
+selector = "normal pressed row 3 col 3"
+asset = "Button-default-press.png"
+
+[[matchrules.border]]
+selector = "normal col 3 row 3"
+asset = "Button-alt2.png"
+
+[[matchrules.border]]
+selector = "normal col 3 row 0"
+asset = "Button-alt1.png"
+
+[[matchrules.border]]
+selector = "normal col 1 row 2"
+asset = "Button-alt3.png"
+
+[[matchrules.border]]
+selector = "normal label b"
+asset = "Button-alt3.png"
+
+[[matchrules.border]]
+selector = "normal label o"
+asset = "Button-alt1.png"
+
+[[matchrules.border]]
+selector = "normal label f"
+asset = "Button-alt3.png"
+
+[[matchrules.border]]
+selector = "functional row 2 col 8 pressed"
+asset = "Button-function-pressed.png"
+
+[[matchrules.border]]
+selector = "functional row -1 col 0 pressed"
+asset = "Button-function2-pressed.png"
+
+[[matchrules.border]]
+selector = "functional pressed"
+asset = "Button-default-press-dark.png"
+
+[[matchrules.border]]
+selector = "functional row 2 col 8"
+asset = "Button-function.png"
+
+[[matchrules.border]]
+selector = "spacebar pressed"
+asset = "Button-space-press.png"
+
+[[matchrules.border]]
+selector = "spacebar"
+asset = "Button-space-dark.png"
+
+[[matchrules.border]]
+selector = "action pressed"
+asset = "Button-action-press.png"
+
+[[matchrules.border]]
+selector = "action"
+asset = "Button-action.png"
+
+[[matchrules.border]]
+selector = "functional row -1 col 0"
+asset = "Button-function2.png"
+
+[[matchrules.border]]
+selector = "functional popup"
+asset = "Button-default-press-dark.png"
+
+[[matchrules.border]]
+selector = "functional"
+asset = "Button-default-dark.png"
+
+[[matchrules.border]]
+selector = "normal popup"
+asset = "Button-default-press.png"
+
+[[matchrules.border]]
+selector = "pressed"
+asset = "Button-default-press.png"
+
+[[matchrules.border]]
+selector = "normal"
+asset = "Button-default.png"
+
+[[matchrules.icon]]
+selector = "icon delete_key"
+asset = "Icon-backspace.png"
+
+[[matchrules.icon]]
+selector = "icon action_emoji"
+asset = "Icon-emoji.png"
+
+[[matchrules.icon]]
+selector = "icon shift_key_shifted"
+asset = "Icon-shift-press.png"
+
+[[matchrules.icon]]
+selector = "icon shift_key"
+asset = "Icon-shift.png"
+
+[[matchrules.icon]]
+selector = "icon enter_key"
+asset = "Icon-enter.png"
+
+# -------------------------------------------------------------------
+# All image assets used above should have a corresponding config here
+# -------------------------------------------------------------------
+
+[[asset.border]]
+name = "Button-default-press-dark.png"
+background_tint = "#ffffff"
+foreground_tint = "#ffffff"
+padding = [0, 0, 0, 0]
+slicing = [0.265, 0.261, 0.746, 0.778]
+gap = [1, 1, 1, 1]
+target_density = 640
+
+[[asset.border]]
+name = "Button-default-press.png"
+background_tint = "#ffffff"
+foreground_tint = "#414447"
+padding = [0, 0, 0, 0]
+slicing = [0.213, 0.358, 0.727, 0.647]
+gap = [1, 1, 1, 1]
+target_density = 640
+
+[[asset.border]]
+name = "Button-alt2.png"
+background_tint = "#ffffff"
+foreground_tint = "#414447"
+padding = [0, 0.2, 0.2, 0]
+slicing = [0.465, 0.353, 0.577, 0.583]
+gap = [1, 1, 1, 1]
+target_density = 640
+
+[[asset.border]]
+name = "Button-alt1.png"
+background_tint = "#ffffff"
+foreground_tint = "#414447"
+padding = [0, 0.2, 0.2, 0]
+slicing = [0.366, 0.363, 0.567, 0.599]
+gap = [1, 1, 1, 1]
+target_density = 640
+
+[[asset.border]]
+name = "Button-alt3.png"
+background_tint = "#ffffff"
+foreground_tint = "#414447"
+padding = [0, 0, 0, 0]
+slicing = [0.484, 0.35, 0.527, 0.592]
+gap = [1, 1, 1, 1]
+target_density = 640
+
+[[asset.border]]
+name = "Button-function-pressed.png"
+background_tint = "#ffffff"
+foreground_tint = "#ffffff"
+padding = [0, 0, 0, 0]
+slicing = [0.412, 0.265, 0.588, 0.614]
+gap = [1, 1, 1, 1]
+target_density = 640
+
+[[asset.border]]
+name = "Button-function2-pressed.png"
+background_tint = "#ffffff"
+foreground_tint = "#ffffff"
+padding = [0, 0, 0, 0]
+slicing = [0.694, 0.243, 0.801, 0.506]
+gap = [1, 1, 1, 1]
+target_density = 640
+
+[[asset.border]]
+name = "Button-function.png"
+background_tint = "#ffffff"
+foreground_tint = "#414447"
+padding = [0, 0, 0, 0]
+slicing = [0.412, 0.265, 0.588, 0.614]
+gap = [1, 1, 1, 1]
+target_density = 640
+
+[[asset.border]]
+name = "Button-space-press.png"
+background_tint = "#ffffff"
+foreground_tint = "#000000"
+padding = [0, 0, 0, 0]
+slicing = [0.223, 0.264, 0.7, 0.623]
+gap = [1, 1, 1, 1]
+target_density = 640
+
+[[asset.border]]
+name = "Button-space-dark.png"
+background_tint = "#ffffff"
+foreground_tint = "#414447"
+padding = [0, 0, 0, 0]
+slicing = [0.223, 0.264, 0.7, 0.623]
+gap = [1, 1, 1, 1]
+target_density = 640
+
+[[asset.border]]
+name = "Button-action-press.png"
+background_tint = "#ffffff"
+foreground_tint = "#ffffff"
+padding = [0, 0, 0, 0]
+slicing = [0.32, 0.292, 0.677, 0.707]
+gap = [1, 1, 1, 1]
+target_density = 640
+
+[[asset.border]]
+name = "Button-action.png"
+background_tint = "#ffffff"
+foreground_tint = "#414447"
+padding = [1, 1, 1, 1]
+slicing = [0.32, 0.292, 0.677, 0.707]
+gap = [1, 1, 1, 1]
+target_density = 640
+
+[[asset.border]]
+name = "Button-function2.png"
+background_tint = "#ffffff"
+foreground_tint = "#414447"
+padding = [0, 0, 0, 0]
+slicing = [0.694, 0.243, 0.801, 0.506]
+gap = [1, 1, 1, 1]
+target_density = 640
+
+[[asset.border]]
+name = "Button-default-dark.png"
+background_tint = "#ffffff"
+foreground_tint = "#414447"
+padding = [0, 0.2, 0.2, 0]
+slicing = [0.217, 0.266, 0.761, 0.78]
+gap = [1, 1, 1, 1]
+target_density = 640
+
+[[asset.border]]
+name = "Button-default.png"
+background_tint = "#ffffff"
+foreground_tint = "#414447"
+padding = [0, 0.2, 0.2, 0]
+slicing = [0.3, 0.3, 0.7, 0.7]
+gap = [1, 1, 1, 1]
+target_density = 640
+
+[[asset.icon]]
+name = "Icon-backspace.png"
+target_density = 640
+
+[[asset.icon]]
+name = "Icon-emoji.png"
+target_density = 640
+
+[[asset.icon]]
+name = "Icon-shift-press.png"
+target_density = 640
+
+[[asset.icon]]
+name = "Icon-shift.png"
+target_density = 640
+
+[[asset.icon]]
+name = "Icon-enter.png"
+target_density = 640
