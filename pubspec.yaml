@@ -1,20 +1,21 @@
-name: ultimate_theme_creator_studio
-description: Flutter studio for creating and exporting FUTO Keyboard themes.
+name: futo_theme_studio
+description: A powerful Flutter app for creating FUTO Keyboard themes.
 publish_to: "none"
-version: 0.1.0+1
+version: 1.0.0+1
+
 environment:
   sdk: ">=3.3.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  archive: ^3.6.1
-  file_picker: ^8.1.7
-  path_provider: ^2.1.5
   shared_preferences: ^2.3.5
-  google_fonts: ^6.2.1
-  flutter_colorpicker: ^1.1.0
+  path_provider: ^2.1.5
+  archive: ^3.6.1
+  image: ^4.3.0
+  file_picker: 8.1.7
   uuid: ^4.5.1
+  share_plus: ^10.1.2
 
 dev_dependencies:
   flutter_test:
@@ -23,7 +24,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/sample_theme/
-    - assets/shapes/
-    - assets/backgrounds/

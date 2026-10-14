@@ -1,0 +1,59 @@
+name: Build Flutter APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+          cache: true
+
+      - name: Generate android/
+        run: |
+          if [ ! -d "android" ]; then
+            flutter create --platforms=android --org com.futotheme --project-name futo_theme_studio .
+          fi
+
+      - name: Fix compileSdk
+        run: |
+          if [ -f "android/app/build.gradle" ]; then
+            sed -i 's/compileSdkVersion [0-9]\+/compileSdkVersion 34/g' android/app/build.gradle
+            sed -i 's/compileSdk [0-9]\+/compileSdk 34/g' android/app/build.gradle
+          fi
+          if [ -f "android/gradle.properties" ]; then
+            cat > android/gradle.properties << 'EOF'
+          org.gradle.jvmargs=-Xmx4G -XX:MaxMetaspaceSize=2G
+          android.useAndroidX=true
+          android.enableJetifier=true
+          EOF
+          fi
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: futo-theme-studio-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error

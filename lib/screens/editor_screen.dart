@@ -1,187 +1,310 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../models/theme_project.dart';
+import '../models/key_shape.dart';
+import '../services/theme_export_service.dart';
+import '../services/asset_generator.dart';
 import '../widgets/keyboard_preview.dart';
 
 class EditorScreen extends StatefulWidget {
-  const EditorScreen({super.key, required this.project, required this.onChanged});
-  final ThemeProject project;
-  final ValueChanged<ThemeProject> onChanged;
+  const EditorScreen({super.key});
 
   @override
   State<EditorScreen> createState() => _EditorScreenState();
 }
 
 class _EditorScreenState extends State<EditorScreen> {
-  late ThemeProject p;
-  String section = 'Colors';
+  late ThemeProject _project;
+  KeyShape _selectedShape = KeyShape.roundedRectangle;
+  final _nameController = TextEditingController();
+  bool _exporting = false;
 
   @override
-  void initState() { super.initState(); p = widget.project; }
-
-  void update(void Function(ThemeProject) change) {
-    setState(() => change(p));
-    widget.onChanged(p);
+  void initState() {
+    super.initState();
+    _project = ThemeProject.createDefault();
+    _nameController.text = _project.name;
   }
 
-  Future<void> chooseColor(String label, Color current, ValueChanged<Color> apply) async {
-    Color chosen = current;
-    await showDialog<void>(context: context, builder: (context) => AlertDialog(
-      title: Text('اختيار اللون — $label'),
-      content: SingleChildScrollView(child: ColorPicker(
-        pickerColor: current, onColorChanged: (c) => chosen = c,
-        enableAlpha: false, displayThumbColor: true,
-      )),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('إلغاء')),
-        FilledButton(onPressed: () { apply(chosen); Navigator.pop(context); }, child: const Text('تطبيق')),
-      ],
-    ));
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickColor(String field) async {
+    Color current;
+    switch (field) {
+      case 'primary': current = _project.primary; break;
+      case 'secondary': current = _project.secondary; break;
+      case 'surface': current = _project.surface; break;
+      case 'keyboardSurface': current = _project.keyboardSurface; break;
+      case 'keyboardContainer': current = _project.keyboardContainer; break;
+      case 'keyboardPress': current = _project.keyboardPress; break;
+      default: return;
+    }
+
+    final picked = await showDialog<Color>(
+      context: context,
+      builder: (_) => _ColorPickerDialog(initial: current),
+    );
+
+    if (picked != null) {
+      setState(() {
+        switch (field) {
+          case 'primary': _project.primary = picked; break;
+          case 'secondary': _project.secondary = picked; break;
+          case 'surface':
+            _project.surface = picked;
+            _project.keyboardSurface = picked;
+            break;
+          case 'keyboardSurface': _project.keyboardSurface = picked; break;
+          case 'keyboardContainer': _project.keyboardContainer = picked; break;
+          case 'keyboardPress': _project.keyboardPress = picked; break;
+        }
+      });
+    }
+  }
+
+  Future<void> _exportTheme() async {
+    setState(() => _exporting = true);
+    try {
+      final dir = await getTemporaryDirectory();
+      final assetsDir = Directory('${dir.path}/futo_assets');
+      if (!await assetsDir.exists()) {
+        await assetsDir.create(recursive: true);
+      }
+
+      // توليد الأزرار
+      final assets = <File>[];
+
+      final btnDefault = await AssetGenerator.generateButtonPng(
+        bgColor: _project.keyboardContainer,
+        borderColor: _project.surface,
+      );
+      assets.add(await AssetGenerator.writePng('Button-default.png', btnDefault, assetsDir));
+
+      final btnFunction = await AssetGenerator.generateButtonPng(
+        bgColor: ThemeExportService.adjustBrightness(_project.keyboardContainer, 0.05).let((h) => _hexToColor(h)),
+        borderColor: _project.surface,
+      );
+      assets.add(await AssetGenerator.writePng('Button-function.png', btnFunction, assetsDir));
+
+      final btnSpace = await AssetGenerator.generateButtonPng(
+        bgColor: _project.keyboardPress,
+        borderColor: _project.surface,
+      );
+      assets.add(await AssetGenerator.writePng('Button-space.png', btnSpace, assetsDir));
+
+      final iconBack = await AssetGenerator.generateIconPng(
+        icon: Icons.backspace_outlined,
+      );
+      assets.add(await AssetGenerator.writePng('Icon-backspace.png', iconBack, assetsDir));
+
+      final iconEnter = await AssetGenerator.generateIconPng(
+        icon: Icons.keyboard_return,
+      );
+      assets.add(await AssetGenerator.writePng('Icon-enter.png', iconEnter, assetsDir));
+
+      // توليد ZIP
+      final file = await ThemeExportService.exportThemeZip(_project, assets, dir);
+
+      if (!mounted) return;
+      await Share.shareXFiles([XFile(file.path)], text: 'FUTO Theme: ${_project.name}');
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('خطأ في التصدير: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _exporting = false);
+    }
+  }
+
+  Color _hexToColor(String hex) {
+    final h = hex.replaceAll('#', '');
+    return Color(int.parse(h, radix: 16));
   }
 
   @override
   Widget build(BuildContext context) {
-    final sections = ['Colors','Gradients','Shapes','Backgrounds','Fonts','Assets','Matchrules','Keys','Effects','Animations','Sounds','Layout','Metadata'];
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Row(children: [
-          Expanded(child: Text(p.name, style: Theme.of(context).textTheme.headlineSmall)),
-          IconButton(tooltip: 'تراجع عن الإعدادات الأساسية', onPressed: () => update((p) {
-            p.primary = const Color(0xFF16D9F2); p.secondary = const Color(0xFF8B5CF6);
-          }), icon: const Icon(Icons.restart_alt)),
-        ]),
-        const SizedBox(height: 12),
-        KeyboardPreview(project: p),
-        const SizedBox(height: 16),
-        Wrap(spacing: 8, runSpacing: 8, children: sections.map((s) => ChoiceChip(
-          label: Text(s), selected: section == s, onSelected: (_) => setState(() => section = s),
-        )).toList()),
-        const SizedBox(height: 14),
-        _panelForSection(),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('FUTO Theme Studio'),
+        actions: [
+          if (_exporting)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            )
+          else
+            IconButton(
+              icon: const Icon(Icons.save_alt),
+              tooltip: 'تصدير ZIP',
+              onPressed: _exportTheme,
+            ),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // اسم الثيم
+          TextField(
+            controller: _nameController,
+            decoration: const InputDecoration(
+              labelText: 'اسم الثيم',
+              border: OutlineInputBorder(),
+            ),
+            onChanged: (v) => setState(() => _project.name = v),
+          ),
+          const SizedBox(height: 20),
+
+          // المعاينة
+          const Text('المعاينة الحية', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          KeyboardPreview(project: _project, shape: _selectedShape),
+          const SizedBox(height: 20),
+
+          // اختيار شكل الأزرار
+          const Text('شكل الأزرار', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: KeyShape.values.map((s) {
+              final selected = s == _selectedShape;
+              return ChoiceChip(
+                label: Text(s.label),
+                selected: selected,
+                onSelected: (_) => setState(() => _selectedShape = s),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 20),
+
+          // محددات الألوان
+          const Text('الألوان', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          _colorTile('اللون الأساسي (Primary)', _project.primary, () => _pickColor('primary')),
+          _colorTile('اللون الثانوي (Secondary)', _project.secondary, () => _pickColor('secondary')),
+          _colorTile('السطح (Surface)', _project.surface, () => _pickColor('surface')),
+          _colorTile('خلفية المفاتيح (Keyboard Container)', _project.keyboardContainer, () => _pickColor('keyboardContainer')),
+          _colorTile('لون الضغط (Keyboard Press)', _project.keyboardPress, () => _pickColor('keyboardPress')),
+          const SizedBox(height: 20),
+
+          // استدارة المفاتيح
+          Text('استدارة المفاتيح: ${(_project.roundedness * 100).toStringAsFixed(0)}%'),
+          Slider(
+            value: _project.roundedness,
+            onChanged: (v) => setState(() => _project.roundedness = v),
+          ),
+          const SizedBox(height: 20),
+
+          // زر التصدير
+          ElevatedButton.icon(
+            onPressed: _exporting ? null : _exportTheme,
+            icon: const Icon(Icons.download),
+            label: const Text('تصدير الثيم كـ ZIP'),
+            style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(56)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _colorTile(String title, Color color, VoidCallback onTap) {
+    return ListTile(
+      title: Text(title),
+      trailing: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.white30, width: 2),
+        ),
+      ),
+      onTap: onTap,
+    );
+  }
+}
+
+extension _Let<T> on T {
+  R let<R>(R Function(T) block) => block(this);
+}
+
+class _ColorPickerDialog extends StatefulWidget {
+  final Color initial;
+  const _ColorPickerDialog({required this.initial});
+
+  @override
+  State<_ColorPickerDialog> createState() => _ColorPickerDialogState();
+}
+
+class _ColorPickerDialogState extends State<_ColorPickerDialog> {
+  late double r, g, b;
+
+  @override
+  void initState() {
+    super.initState();
+    r = widget.initial.r * 255;
+    g = widget.initial.g * 255;
+    b = widget.initial.b * 255;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('اختر لوناً'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: 60,
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(r.round(), g.round(), b.round(), 1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            const SizedBox(height: 16),
+            _slider('R', r, (v) => setState(() => r = v)),
+            _slider('G', g, (v) => setState(() => g = v)),
+            _slider('B', b, (v) => setState(() => b = v)),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('إلغاء'),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.pop(
+            context,
+            Color.fromRGBO(r.round(), g.round(), b.round(), 1),
+          ),
+          child: const Text('موافق'),
+        ),
       ],
     );
   }
 
-  Widget _panelForSection() {
-    switch (section) {
-      case 'Colors':
-        return Column(children: [
-          _colorTile('لون أساسي', p.primary, (c) => update((p) => p.primary = c)),
-          _colorTile('اللون الثانوي', p.secondary, (c) => update((p) => p.secondary = c)),
-          _colorTile('خلفية لوحة المفاتيح', p.background, (c) => update((p) => p.background = c)),
-          _colorTile('لون المفتاح', p.keyColor, (c) => update((p) => p.keyColor = c)),
-          _colorTile('لون النص', p.keyText, (c) => update((p) => p.keyText = c)),
-          _colorTile('الأزرار الوظيفية', p.functionKey, (c) => update((p) => p.functionKey = c)),
-          _colorTile('لون الحدود', p.outline, (c) => update((p) => p.outline = c)),
-        ]);
-      case 'Gradients':
-        return _card('التدرجات', Column(children: [
-          SwitchListTile(title: const Text('تفعيل التدرج في المفاتيح'), value: p.useGradient,
-            onChanged: (v) => update((p) => p.useGradient = v)),
-          Wrap(spacing: 8, children: [
-            _gradientChip('Aurora', const [Color(0xFF16D9F2), Color(0xFF8B5CF6)]),
-            _gradientChip('Sunset', const [Color(0xFFFF8A65), Color(0xFFEC4899)]),
-            _gradientChip('Forest', const [Color(0xFF16A34A), Color(0xFF064E3B)]),
-            _gradientChip('Gold', const [Color(0xFFFDE68A), Color(0xFFB45309)]),
-          ]),
-        ]));
-      case 'Shapes':
-        return _card('مكتبة الأشكال', Wrap(spacing: 10, runSpacing: 10, children: [
-          for (final item in ['Rounded','Pill','Square','Soft','Outlined','Glass'])
-            ChoiceChip(label: Text(item), selected: p.shapeName == item, onSelected: (_) => update((p) { p.shapeName = item; p.radius = item == 'Square' ? 3 : item == 'Pill' ? 24 : 12; })),
-          _slider('استدارة الحواف', p.radius, 2, 26, (v) => update((p) => p.radius = v)),
-          const Text('مجموعة أولية من الأنماط؛ يمكن توسيع المكتبة بإضافة SVG/PNG مرخصة.'),
-        ]));
-      case 'Backgrounds':
-        return _card('الخلفيات', Column(children: [
-          SwitchListTile(title: const Text('استخدام صورة خلفية'), value: p.useBackgroundImage, onChanged: (v) => update((p) => p.useBackgroundImage = v)),
-          DropdownButtonFormField<String>(value: p.backgroundName, decoration: const InputDecoration(labelText: 'الخلفية المختارة'),
-            items: ['Midnight','Woodland','Pet Paws','Sunset','Galaxy','Minimal'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-            onChanged: (v) => update((p) => p.backgroundName = v ?? 'Midnight')),
-          const SizedBox(height: 8),
-          const Text('استيراد الصور من الهاتف سيُضاف عبر منتقي الملفات في شاشة الأصول.'),
-        ]));
-      case 'Fonts':
-        return _card('الخطوط', Column(children: [
-          DropdownButtonFormField<String>(value: p.fontName, decoration: const InputDecoration(labelText: 'خط المعاينة'),
-            items: ['Roboto','Cairo','Tajawal','Amiri','Noto Sans Arabic','Poppins','Montserrat'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-            onChanged: (v) => update((p) => p.fontName = v ?? 'Roboto')),
-          const SizedBox(height: 10),
-          const Text('الخطوط التي يتطلب تنزيلها تحتاج اتصالًا بالإنترنت. يلزم تضمين ملف TTF/OTF مناسب داخل ZIP كي يستخدمه FUTO، إذا كان مدعومًا في إعدادات الثيم.'),
-        ]));
-      case 'Keys':
-        return _card('نظام المفاتيح', Column(children: [
-          SwitchListTile(title: const Text('إظهار شريط الأدوات'), value: p.showActionRow, onChanged: (v) => update((p) => p.showActionRow = v)),
-          SwitchListTile(title: const Text('إظهار شريط الاقتراحات'), value: p.showSuggestionRow, onChanged: (v) => update((p) => p.showSuggestionRow = v)),
-          _slider('حجم الحروف', p.keyScale, .7, 1.4, (v) => update((p) => p.keyScale = v)),
-          _slider('المسافة بين المفاتيح', p.keyGap, 1, 8, (v) => update((p) => p.keyGap = v)),
-        ]));
-      case 'Layout':
-        return _card('التخطيط', Column(children: [
-          DropdownButtonFormField<String>(value: p.layoutName, decoration: const InputDecoration(labelText: 'تخطيط لوحة المفاتيح'),
-            items: ['Arabic','English QWERTY','AZERTY','QWERTZ','Compact'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-            onChanged: (v) => update((p) => p.layoutName = v ?? 'Arabic')),
-          const Text('المعاينة الحالية تعرض تخطيطًا عربيًا بصريًا. مطابقة التخطيطات الأخرى تحتاج إلى التحقق مقابل تخطيطات FUTO الفعلية.'),
-        ]));
-      case 'Metadata':
-        return _card('البيانات الوصفية', Column(children: [
-          _textField('اسم الثيم', p.name, (v) => update((p) => p.name = v)),
-          _textField('المؤلف', p.author, (v) => update((p) => p.author = v)),
-          _textField('الوصف', p.description, (v) => update((p) => p.description = v), maxLines: 3),
-        ]));
-      case 'Matchrules':
-        return _card('قواعد المطابقة', const Text('القواعد المبدئية: normal، functional، spacebar، delete_key، enter_key. تُولَّد القواعد مع الأصول المتوافقة في حزمة ZIP. أضف القواعد المتقدمة بعد التحقق من selectors المدعومة رسميًا.'));
-      case 'Assets':
-        return _card('الأصول', const Text('إدارة PNG وSVG والخطوط والخلفيات. سيضمّن المصدّر الأصول التي تُمرّر إليه ويتحقق من وجودها. أضف ملفاتك إلى المشروع داخل assets/ أو استوردها من الهاتف.'));
-      case 'Effects':
-        return _card('التأثيرات', const Text('المعاينة تدعم تدرجًا بصريًا وحدودًا. تأثيرات مثل blur وglow والأنيميشن ليست بالضرورة قابلة للتصدير إلى FUTO كإعدادات مباشرة؛ يلزم تحويلها إلى صور أصول إذا كان التنسيق يدعمها.'));
-      case 'Animations':
-        return _card('الأنيميشن', const Text('إعدادات الحركة مخصصة لواجهة الاستوديو. لا تُصدَّر حركة الزر على أنها ميزة FUTO إلا إذا دعمها التنسيق المستهدف.'));
-      case 'Sounds':
-        return _card('الأصوات', const Text('يمكن إضافة معاينة صوتية داخل الاستوديو مستقبلًا. حزمة الثيم لا تتضمن أصواتًا إلا إذا كان تنسيق FUTO المستهدف يدعمها.'));
-      default:
-        return _card(section, const Text('لوحة إعدادات جاهزة للتوسعة مع الحفاظ على نموذج بيانات موحد.'));
-    }
+  Widget _slider(String label, double value, ValueChanged<double> onChange) {
+    return Row(
+      children: [
+        SizedBox(width: 20, child: Text(label)),
+        Expanded(
+          child: Slider(value: value, min: 0, max: 255, onChanged: onChange),
+        ),
+        SizedBox(width: 40, child: Text(value.round().toString())),
+      ],
+    );
   }
-
-  Widget _colorTile(String label, Color color, ValueChanged<Color> apply) => Card(
-    child: ListTile(
-      leading: Container(width: 34, height: 34, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(9), border: Border.all(color: Colors.white24))),
-      title: Text(label),
-      subtitle: Text('#${color.value.toRadixString(16).substring(2).toUpperCase()}'),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () => chooseColor(label, color, apply),
-    ),
-  );
-
-  Widget _gradientChip(String name, List<Color> colors) => InkWell(
-    onTap: () => update((p) { p.gradientName = name; p.primary = colors.first; p.secondary = colors.last; p.useGradient = true; }),
-    child: Container(width: 78, height: 56, margin: const EdgeInsets.symmetric(vertical: 6),
-      decoration: BoxDecoration(gradient: LinearGradient(colors: colors), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.white30)),
-      child: Align(alignment: Alignment.bottomCenter, child: Container(
-        width: double.infinity, padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(color: Colors.black.withValues(alpha: .28), borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12))),
-        child: Text(name, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 10)),
-      )),
-    ),
-  );
-
-  Widget _slider(String label, double value, double min, double max, ValueChanged<double> onChanged) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [Text('$label: ${value.toStringAsFixed(1)}'), Slider(value: value.clamp(min, max), min: min, max: max, onChanged: onChanged)],
-  );
-
-  Widget _textField(String label, String value, ValueChanged<String> onChanged, {int maxLines = 1}) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
-    child: TextFormField(initialValue: value, maxLines: maxLines, decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
-      onChanged: onChanged),
-  );
-
-  Widget _card(String title, Widget child) => Card(
-    child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(title, style: Theme.of(context).textTheme.titleLarge),
-      const SizedBox(height: 12), child,
-    ])),
-  );
 }

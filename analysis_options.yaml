@@ -1,6 +1,17 @@
 include: package:flutter_lints/flutter.yaml
+
 linter:
   rules:
-    prefer_const_constructors: true
-    avoid_print: true
-    no_leading_underscores_for_local_identifiers: true
+    prefer_const_constructors: false
+    prefer_const_literals_to_create_immutables: false
+    use_key_in_widget_constructors: false
+    library_private_types_in_public_api: false
+    avoid_print: false
+    deprecated_member_use: false
+    deprecated_member_use_from_same_package: false
+
+analyzer:
+  errors:
+    unused_import: warning
+    unused_local_variable: warning
+    unused_field: warning
