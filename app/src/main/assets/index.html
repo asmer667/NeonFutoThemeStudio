@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>FUTO Theme Pro - Arabic</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    :root {
+      --bg-main: #07090e; --bg-card: #121824; --bg-input: #1b2436;
+      --accent: #ff007f; --accent-neon: #00f0ff; --text-main: #ffffff;
+      --text-muted: #8e9bb0; --border-color: rgba(0, 240, 255, 0.15);
+      --key-bg: #1f2736;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg-main); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; padding-top: env(safe-area-inset-top); }
+    header { background: rgba(18, 24, 36, 0.9); backdrop-filter: blur(10px); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+    .app-title { font-size: 1.15rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent-neon)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .btn-small { background: var(--bg-input); color: var(--accent-neon); border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
+    
+    .tabs-bar { display: flex; background: var(--bg-card); overflow-x: auto; border-bottom: 1px solid var(--border-color); scrollbar-width: none; flex-shrink: 0; padding: 4px; gap: 4px; }
+    .tabs-bar::-webkit-scrollbar { display: none; }
+    .tab-item { flex: 1; min-width: 75px; padding: 10px 6px; text-align: center; font-size: 0.8rem; color: var(--text-muted); border-radius: 12px; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+    .tab-item.active { color: var(--accent-neon); background: rgba(0, 240, 255, 0.08); border: 1px solid rgba(0, 240, 255, 0.2); font-weight: bold; }
+
+    main { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+    .tab-pane { display: none; flex-direction: column; gap: 12px; }
+    .tab-pane.active { display: flex; }
+    .section-title { font-size: 0.85rem; color: var(--accent-neon); font-weight: 700; margin-bottom: 4px; }
+
+    .color-picker-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .color-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 10px; border-radius: 14px; display: flex; align-items: center; gap: 10px; }
+    .color-preview-box { width: 38px; height: 38px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.1); position: relative; overflow: hidden; cursor: pointer; flex-shrink: 0; }
+    .color-preview-box input[type="color"] { position: absolute; top: -15px; left: -15px; width: 70px; height: 70px; opacity: 0; cursor: pointer; }
+    .color-card-info { display: flex; flex-direction: column; overflow: hidden; }
+    .color-card-title { font-size: 0.78rem; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+    .color-card-hex { font-size: 0.7rem; color: var(--text-muted); font-family: monospace; }
+
+    .file-dropzone { border: 2px dashed rgba(0,240,255,0.3); background: var(--bg-card); border-radius: 16px; padding: 18px; text-align: center; cursor: pointer; position: relative; }
+    .file-dropzone input[type="file"] { position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0; cursor: pointer; }
+    .asset-list { display: flex; flex-direction: column; gap: 6px; }
+    .asset-item { background: var(--bg-card); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+    .input-text { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; outline: none; width: 100%; }
+
+    .preview-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 10px; display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+    .preview-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-muted); }
+    .kb-preview { background: var(--kb-bg, #121622); border-radius: 12px; padding: 6px; display: flex; flex-direction: column; gap: 5px; background-size: cover; background-position: center; }
+    .kb-row { display: flex; justify-content: center; gap: 3px; }
+    .kb-key { background: var(--key-bg, #1f2736); color: var(--key-text, #ffffff); border-radius: 6px; height: 36px; flex: 1; max-width: 34px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.06); }
+    .kb-key.wide { max-width: 50px; font-size: 0.7rem; }
+    .kb-key.space { max-width: 130px; }
+    .kb-key.enter { max-width: 50px; background: var(--accent-neon); color: #000; font-weight: bold; }
+
+    .footer-actions { background: rgba(18, 24, 36, 0.9); backdrop-filter: blur(10px); padding: 12px 16px; border-top: 1px solid var(--border-color); display: flex; flex-shrink: 0; }
+    .btn-primary { flex: 1; background: linear-gradient(135deg, var(--accent), #7b00ff); color: #fff; border: none; padding: 13px; border-radius: 14px; font-weight: bold; font-size: 0.9rem; cursor: pointer; text-align: center; box-shadow: 0 4px 20px rgba(255,0,127,0.4); }
+    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #00f0ff; color: #000; padding: 10px 20px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; transition: 0.3s; z-index: 1000; box-shadow: 0 5px 20px rgba(0,240,255,0.5); }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <div id="toast" class="toast">تم الحفظ في مجلد التنزيلات بنجاح!</div>
+
+  <header>
+    <div class="app-title">✨ FUTO Theme Pro</div>
+    <button class="btn-small" id="langToggle">English</button>
+  </header>
+
+  <div class="tabs-bar">
+    <div class="tab-item active" data-tab="colors" id="tabColors">🎨 الألوان</div>
+    <div class="tab-item" data-tab="assets" id="tabAssets">📂 الأصول</div>
+    <div class="tab-item" data-tab="config" id="tabConfig">⚙️ الإعدادات</div>
+  </div>
+
+  <main>
+    <div class="tab-pane active" id="pane-colors">
+      <div class="section-title">لوحة الألوان الأساسية</div>
+      <div class="color-picker-grid">
+        <div class="color-card">
+          <div class="color-preview-box" id="box-bg" style="background-color: #121622;"><input type="color" id="picker-bg" value="#121622"></div>
+          <div class="color-card-info"><span class="color-card-title" id="lbl-bg">خلفية اللوحة</span><span class="color-card-hex" id="hex-bg">#121622</span></div>
+        </div>
+        <div class="color-card">
+          <div class="color-preview-box" id="box-key" style="background-color: #1f2736;"><input type="color" id="picker-key" value="#1f2736"></div>
+          <div class="color-card-info"><span class="color-card-title" id="lbl-key">لون المفاتيح</span><span class="color-card-hex" id="hex-key">#1f2736</span></div>
+        </div>
+        <div class="color-card">
+          <div class="color-preview-box" id="box-text" style="background-color: #ffffff;"><input type="color" id="picker-text" value="#ffffff"></div>
+          <div class="color-card-info"><span class="color-card-title" id="lbl-text">لون الحروف</span><span class="color-card-hex" id="hex-text">#ffffff</span></div>
+        </div>
+        <div class="color-card">
+          <div class="color-preview-box" id="box-accent" style="background-color: #00f0ff;"><input type="color" id="picker-accent" value="#00f0ff"></div>
+          <div class="color-card-info"><span class="color-card-title" id="lbl-accent">زر الإدخال</span><span class="color-card-hex" id="hex-accent">#00f0ff</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="pane-assets">
+      <div class="section-title">إضافة الخلفيات والخطوط</div>
+      <div class="file-dropzone">
+        <input type="file" id="assetInput" accept="image/*,.ttf,.woff2" multiple>
+        <div style="font-size: 1.6rem; margin-bottom: 6px;">📁</div>
+        <div style="font-size: 0.85rem; font-weight: bold;" id="dropTitle">اختر صورة خلفية أو خط لوحة المفاتيح</div>
+        <div style="font-size: 0.7rem; color: var(--text-muted);" id="dropDesc">دعم كامل لملفات الصور والخطوط المحلية</div>
+      </div>
+      <div class="asset-list" id="assetContainer"></div>
+    </div>
+
+    <div class="tab-pane" id="pane-config">
+      <div class="section-title">معلومات الثيم</div>
+      <div class="form-group">
+        <label class="form-label" id="lblThemeName">اسم الثيم</label>
+        <input type="text" class="input-text" id="themeName" value="Neon FUTO Custom">
+      </div>
+      <div class="form-group">
+        <label class="form-label" id="lblAuthor">المصمم</label>
+        <input type="text" class="input-text" id="themeAuthor" value="Adham Najeeb">
+      </div>
+      <div class="form-group">
+        <label class="form-label" id="lblVersion">الإصدار</label>
+        <input type="text" class="input-text" id="themeVersion" value="1.0.0">
+      </div>
+    </div>
+
+    <div class="preview-container">
+      <div class="preview-header"><span id="previewTitle">معاينة حية للوحة المفاتيح</span><span>FUTO</span></div>
+      <div class="kb-preview" id="kbBoard">
+        <div class="kb-row"><div class="kb-key">q</div><div class="kb-key">w</div><div class="kb-key">e</div><div class="kb-key">r</div><div class="kb-key">t</div><div class="kb-key">y</div><div class="kb-key">u</div><div class="kb-key">i</div><div class="kb-key">o</div><div class="kb-key">p</div></div>
+        <div class="kb-row"><div class="kb-key">a</div><div class="kb-key">s</div><div class="kb-key">d</div><div class="kb-key">f</div><div class="kb-key">g</div><div class="kb-key">h</div><div class="kb-key">j</div><div class="kb-key">k</div><div class="kb-key">l</div></div>
+        <div class="kb-row"><div class="kb-key wide">⇧</div><div class="kb-key">z</div><div class="kb-key">x</div><div class="kb-key">c</div><div class="kb-key">v</div><div class="kb-key">b</div><div class="kb-key">n</div><div class="kb-key">m</div><div class="kb-key wide">⌫</div></div>
+        <div class="kb-row"><div class="kb-key wide">?123</div><div class="kb-key">🌐</div><div class="kb-key space">space</div><div class="kb-key">.</div><div class="kb-key enter">↵</div></div>
+      </div>
+    </div>
+  </main>
+
+  <div class="footer-actions">
+    <button class="btn-primary" id="btnExport">💾 تصدير وحفظ الثيم مباشرة إلى الداونلود</button>
+  </div>
+
+  <script>
+    const i18n = {
+      ar: { tabColors: "🎨 الألوان", tabAssets: "📂 الأصول", tabConfig: "⚙️ الإعدادات", lblBg: "خلفية اللوحة", lblKey: "لون المفاتيح", lblText: "لون الحروف", lblAccent: "زر الإدخال", dropTitle: "اختر صورة خلفية أو خط لوحة المفاتيح", dropDesc: "دعم كامل لملفات الصور والخطوط المحلية", lblThemeName: "اسم الثيم", lblAuthor: "المصمم", lblVersion: "الإصدار", previewTitle: "معاينة حية للوحة المفاتيح", btnExport: "💾 تصدير وحفظ الثيم مباشرة إلى الداونلود", langBtn: "English", toastMsg: "تم الحفظ في مجلد التنزيلات بنجاح!" },
+      en: { tabColors: "🎨 Colors", tabAssets: "📂 Assets", tabConfig: "⚙️ Settings", lblBg: "Surface", lblKey: "Keys", lblText: "Text", lblAccent: "Enter", dropTitle: "Add Background or Font file", dropDesc: "Supports images and local font files", lblThemeName: "Theme Name", lblAuthor: "Author", lblVersion: "Version", previewTitle: "Live Keyboard Preview", btnExport: "💾 Export & Save to Downloads", langBtn: "العربية", toastMsg: "Saved to Downloads folder successfully!" }
+    };
+    let currentLang = 'ar', loadedAssets = [];
+
+    document.querySelectorAll('.tab-item').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(`pane-${tab.dataset.tab}`).classList.add('active');
+      });
+    });
+
+    function bindColorPicker(pickerId, boxId, hexId, cssVar) {
+      const picker = document.getElementById(pickerId), box = document.getElementById(boxId), hex = document.getElementById(hexId);
+      picker.addEventListener('input', (e) => {
+        const val = e.target.value;
+        box.style.backgroundColor = val;
+        hex.textContent = val;
+        if (cssVar === '--kb-bg') document.getElementById('kbBoard').style.setProperty('--kb-bg', val);
+        else if (cssVar === '--key-bg') document.querySelectorAll('.kb-key:not(.enter)').forEach(k => k.style.backgroundColor = val);
+        else if (cssVar === '--key-text') document.querySelectorAll('.kb-key:not(.enter)').forEach(k => k.style.color = val);
+        else if (cssVar === '--key-accent') document.querySelector('.kb-key.enter').style.backgroundColor = val;
+      });
+    }
+    bindColorPicker('picker-bg', 'box-bg', 'hex-bg', '--kb-bg');
+    bindColorPicker('picker-key', 'box-key', 'hex-key', '--key-bg');
+    bindColorPicker('picker-text', 'box-text', 'hex-text', '--key-text');
+    bindColorPicker('picker-accent', 'box-accent', 'hex-accent', '--key-accent');
+
+    document.getElementById('assetInput').addEventListener('change', (e) => {
+      Array.from(e.target.files).forEach(file => {
+        loadedAssets.push(file);
+        const container = document.getElementById('assetContainer');
+        const item = document.createElement('div');
+        item.className = 'asset-item';
+        item.innerHTML = `<span>📁 ${file.name}</span><span style="color: var(--accent-neon);">${(file.size/1024).toFixed(1)} KB</span>`;
+        container.appendChild(item);
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (ev) => document.getElementById('kbBoard').style.backgroundImage = `url(${ev.target.result})`;
+          reader.readAsDataURL(file);
+        }
+      });
+    });
+
+    document.getElementById('langToggle').addEventListener('click', () => {
+      currentLang = currentLang === 'ar' ? 'en' : 'ar';
+      document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+      const d = i18n[currentLang];
+      document.getElementById('tabColors').textContent = d.tabColors;
+      document.getElementById('tabAssets').textContent = d.tabAssets;
+      document.getElementById('tabConfig').textContent = d.tabConfig;
+      document.getElementById('lbl-bg').textContent = d.lblBg;
+      document.getElementById('lbl-key').textContent = d.lblKey;
+      document.getElementById('lbl-text').textContent = d.lblText;
+      document.getElementById('lbl-accent').textContent = d.lblAccent;
+      document.getElementById('dropTitle').textContent = d.dropTitle;
+      document.getElementById('dropDesc').textContent = d.dropDesc;
+      document.getElementById('lblThemeName').textContent = d.lblThemeName;
+      document.getElementById('lblAuthor').textContent = d.lblAuthor;
+      document.getElementById('lblVersion').textContent = d.lblVersion;
+      document.getElementById('previewTitle').textContent = d.previewTitle;
+      document.getElementById('btnExport').textContent = d.btnExport;
+      document.getElementById('langToggle').textContent = d.langBtn;
+      document.getElementById('toast').textContent = d.toastMsg;
+    });
+
+    document.getElementById('btnExport').addEventListener('click', () => {
+      const zip = new JSZip();
+      const name = document.getElementById('themeName').value || "Theme";
+      const author = document.getElementById('themeAuthor').value || "Adham";
+      const ver = document.getElementById('themeVersion').value || "1.0.0";
+      const toml = `[metadata]\nname = "${name}"\nauthor = "${author}"\nversion = "${ver}"\n\n[colors]\nkeyboardSurface = "${document.getElementById('picker-bg').value}"\nkeyboardContainer = "${document.getElementById('picker-key').value}"\nonKeyboardContainer = "${document.getElementById('picker-text').value}"\nprimary = "${document.getElementById('picker-accent').value}"\n`;
+      
+      zip.file("theme.toml", toml);
+      loadedAssets.forEach(file => zip.file(file.name, file));
+      
+      zip.generateAsync({ type: "base64" }).then(base64data => {
+        const fileName = `${name.replace(/\s+/g, '_')}.zip`;
+        if (window.AndroidInterface && window.AndroidInterface.saveThemeZip) {
+          window.AndroidInterface.saveThemeZip(base64data, fileName);
+        } else {
+          // بديل متصفح احتياطي في حال التشغيل التجريبي
+          const link = document.createElement("a");
+          link.href = "data:application/zip;base64," + base64data;
+          link.download = fileName;
+          link.click();
+        }
+        
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+      });
+    });
+  </script>
+</body>
+</html>
