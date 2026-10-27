@@ -41,21 +41,29 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val webView = WebView(this)
-        setContentView(webView)
+        
+        try {
+            val webView = WebView(this)
+            setContentView(webView)
 
-        webView.settings.apply {
-            javaScriptEnabled = true
-            domStorageEnabled = true
-            allowFileAccess = true
-            allowContentAccess = true
-            useWideViewPort = true
-            loadWithOverviewMode = true
-            cacheMode = WebSettings.LOAD_DEFAULT
+            webView.settings.apply {
+                javaScriptEnabled = true
+                domStorageEnabled = true
+                allowFileAccess = true
+                allowContentAccess = true
+                useWideViewPort = true
+                loadWithOverviewMode = true
+                cacheMode = WebSettings.LOAD_DEFAULT
+            }
+
+            webView.addJavascriptInterface(WebAppInterface(this), "AndroidInterface")
+            webView.webViewClient = WebViewClient()
+            
+            // تحميل الواجهة المحلية مع حماية المسار
+            webView.loadUrl("file:///android_asset/index.html")
+            
+        } catch (e: Exception) {
+            Toast.makeText(this, "خطأ في التشغيل: ${e.message}", Toast.LENGTH_LONG).show()
         }
-
-        webView.addJavascriptInterface(WebAppInterface(this), "AndroidInterface")
-        webView.webViewClient = WebViewClient()
-        webView.loadUrl("file:///android_asset/index.html")
     }
 }
