@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.os.Environment
+import android.util.Base64
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -11,14 +12,14 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.io.File
-import java.util.Base64
 
 class WebAppInterface(private val context: Context) {
     @JavascriptInterface
     fun saveThemeZip(base64Data: String, fileName: String) {
         try {
             val cleanData = if (base64Data.contains(",")) base64Data.substringAfter(",") else base64Data
-            val decodedBytes = Base64.getDecoder().decode(cleanData)
+            // استخدام مكتبة أندرويد الآمنة والمتوافقة مع جميع الإصدارات
+            val decodedBytes = Base64.decode(cleanData, Base64.DEFAULT)
             val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             if (!downloadsDir.exists()) downloadsDir.mkdirs()
             
@@ -43,7 +44,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         
         try {
-            // استخدام الـ Layout القياسي لضمان عدم حدوث أي كراش في الـ WebView
             setContentView(R.layout.activity_main)
             val webView = findViewById<WebView>(R.id.webView)
 
@@ -60,7 +60,6 @@ class MainActivity : AppCompatActivity() {
             webView.addJavascriptInterface(WebAppInterface(this), "AndroidInterface")
             webView.webViewClient = WebViewClient()
             
-            // تحميل الواجهة المحلية
             webView.loadUrl("file:///android_asset/index.html")
             
         } catch (e: Exception) {
