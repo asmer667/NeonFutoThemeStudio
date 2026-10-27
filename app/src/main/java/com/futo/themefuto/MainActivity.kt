@@ -27,11 +27,11 @@ class WebAppInterface(private val context: Context) {
             file.writeBytes(decodedBytes)
             
             (context as? AppCompatActivity)?.runOnUiThread {
-                Toast.makeText(context, "تم حفظ الثيم بنجاح في مجلد التنزيلات: ${file.name}", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "تم حفظ الثيم في الداونلود: ${file.name}", Toast.LENGTH_LONG).show()
             }
         } catch (e: Exception) {
             (context as? AppCompatActivity)?.runOnUiThread {
-                Toast.makeText(context, "فشل الحفظ: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "خطأ الحفظ: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -43,8 +43,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         
         try {
-            val webView = WebView(this)
-            setContentView(webView)
+            // استخدام الـ Layout القياسي لضمان عدم حدوث أي كراش في الـ WebView
+            setContentView(R.layout.activity_main)
+            val webView = findViewById<WebView>(R.id.webView)
 
             webView.settings.apply {
                 javaScriptEnabled = true
@@ -59,11 +60,11 @@ class MainActivity : AppCompatActivity() {
             webView.addJavascriptInterface(WebAppInterface(this), "AndroidInterface")
             webView.webViewClient = WebViewClient()
             
-            // تحميل الواجهة المحلية مع حماية المسار
+            // تحميل الواجهة المحلية
             webView.loadUrl("file:///android_asset/index.html")
             
         } catch (e: Exception) {
-            Toast.makeText(this, "خطأ في التشغيل: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "خطأ التشغيل: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 }
